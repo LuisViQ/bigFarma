@@ -1,0 +1,482 @@
+:root {
+  --bg-body: #0f172a;
+  --bg-card: #0b1120;
+  --bg-input: #020617;
+  --border-color: #1e293b;
+  --accent: #22c55e;
+  --accent-soft: #16a34a;
+  --text-main: #e5e7eb;
+  --text-muted: #9ca3af;
+  --danger: #ef4444;
+  --radius-lg: 16px;
+  --shadow-soft: 0 20px 40px rgba(0, 0, 0, 0.45);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: radial-gradient(circle at top, #1d283a, #020617 60%);
+  color: var(--text-main);
+  /* REMOVIDO o flex que deixava tudo centralizado */
+  padding: 24px;
+}
+
+/* Layout principal */
+.app-container {
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;           /* centraliza horizontal, mas ocupa a tela toda */
+}
+
+/* Header */
+.app-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+  justify-content: space-between;
+}
+
+/* Logos menores */
+.logo-area-left,
+.logo-area-right {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+}
+
+.logo-area {
+  flex-shrink: 0;
+}
+
+/* Container da logo */
+.logo-placeholder {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  border: 2px dashed var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  overflow: hidden;
+  padding: 2px;
+}
+
+/* Imagem da logo dentro do placeholder */
+.logo-placeholder img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 6px;
+}
+
+.title-area h1 {
+  margin: 0;
+  font-size: 1.4rem;
+  letter-spacing: 0.04em;
+}
+
+.subtitle {
+  margin: 2px 0 0;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+/* Card principal */
+.card {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  padding: 20px 20px 24px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  backdrop-filter: blur(16px);
+}
+
+/* Sections */
+.section + .section {
+  margin-top: 16px;
+}
+
+.section h2 {
+  margin: 0 0 8px;
+  font-size: 1.1rem;
+}
+
+.section-text {
+  margin: 0 0 12px;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+/* Divider */
+.divider {
+  border: none;
+  border-top: 1px solid var(--border-color);
+  margin: 18px 0;
+}
+
+/* Formulários */
+.form-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.form-row label {
+  min-width: 120px;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.form-row input[type="file"] {
+  color: var(--text-main);
+}
+
+/* Grid para produto/preço/quantidade e dados */
+.form-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 12px;
+}
+
+textarea {
+  background: #0f172a;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  padding: 10px 12px;
+  color: var(--text-main);
+  font-size: 0.95rem;
+  outline: none;
+  width: 100%;
+  resize: vertical;
+  min-height: 80px;
+  transition: 0.2s ease-in-out;
+}
+
+textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.25);
+  background: #101d33;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.form-group label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* Estilo para o seletor de data */
+input[type="date"] {
+  background: var(--bg-input);
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  padding: 8px 10px;
+  color: var(--text-main);
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  appearance: none;
+}
+
+/* Ajusta o ícone/calendário (Chrome/Edge) */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1) opacity(0.7);
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  filter: invert(1) opacity(1);
+}
+
+/* Foco do seletor de data */
+input[type="date"]:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.4);
+}
+
+input[type="text"],
+input[type="number"],
+input[list] {
+  background: #0f172a;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  padding: 12px 14px;
+  color: var(--text-main);
+  font-size: 0.95rem;
+  outline: none;
+  width: 100%;
+  transition: 0.2s ease-in-out;
+}
+
+#produtoNome {
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+/* Hover */
+input[type="text"]:hover,
+input[type="number"]:hover {
+  border-color: rgba(34, 197, 94, 0.35);
+}
+
+/* Focus bonito */
+input[type="text"]:focus,
+input[type="number"]:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.25);
+  background: #101d33;
+}
+
+/* Placeholder mais suave */
+input::placeholder {
+  color: #94a3b8;
+  opacity: .7;
+}
+
+/* Botões */
+.actions-row {
+  margin-top: 12px;
+}
+
+.btn {
+  border: none;
+  border-radius: 999px;
+  padding: 8px 18px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.15s ease;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #022c22;
+  box-shadow: 0 8px 18px rgba(34, 197, 94, 0.4);
+}
+
+.btn-primary:hover {
+  background: var(--accent-soft);
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(34, 197, 94, 0.45);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 6px 12px rgba(34, 197, 94, 0.35);
+}
+
+/* Botão remover */
+.btn-remover {
+  background: rgba(239, 68, 68, 0.08);
+  color: var(--danger);
+  border-radius: 999px;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.btn-remover:hover {
+  background: rgba(239, 68, 68, 0.2);
+  transform: translateY(-1px);
+}
+
+/* Tabela do carrinho */
+.table-wrapper {
+  overflow-x: auto;
+}
+
+.cart-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.cart-table thead {
+  background: rgba(15, 23, 42, 0.9);
+}
+
+.cart-table th,
+.cart-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(30, 64, 175, 0.35);
+}
+
+.cart-table th {
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.cart-table tbody tr:nth-child(even) {
+  background: rgba(15, 23, 42, 0.4);
+}
+
+.cart-table tbody tr:hover {
+  background: rgba(30, 64, 175, 0.4);
+}
+
+.total-label {
+  text-align: right;
+  padding-right: 10px;
+}
+
+.total-value {
+  font-weight: 700;
+  color: var(--accent);
+}
+
+/* Footer */
+.app-footer {
+  margin-top: 12px;
+  text-align: right;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* Responsivo - tablets / celulares maiores */
+@media (max-width: 768px) {
+  body {
+    padding: 12px;
+  }
+
+  .app-container {
+    max-width: 100%;
+  }
+
+  .app-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .logo-area-left,
+  .logo-area-right,
+  .logo-placeholder {
+    width: 32px;
+    height: 32px;
+  }
+
+  .title-area h1 {
+    font-size: 1.2rem;
+  }
+
+  .subtitle {
+    font-size: 0.75rem;
+  }
+
+  .card {
+    padding: 14px 12px 16px;
+    border-radius: 12px;
+  }
+
+  .section {
+    margin-top: 10px;
+  }
+
+  .section h2 {
+    font-size: 1rem;
+  }
+
+  .section-text {
+    font-size: 0.8rem;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .form-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .form-row label {
+    min-width: auto;
+  }
+
+  .table-wrapper {
+    margin-top: 8px;
+  }
+
+  .cart-table {
+    font-size: 0.8rem;
+  }
+
+  .cart-table th,
+  .cart-table td {
+    padding: 6px 6px;
+  }
+
+  .total-label {
+    padding-right: 4px;
+  }
+
+  .btn {
+    padding: 8px 14px;
+    font-size: 0.85rem;
+  }
+
+  .actions-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+}
+
+/* Responsivo - celulares pequenos */
+@media (max-width: 480px) {
+  body {
+    padding: 8px;
+  }
+
+  .card {
+    padding: 12px 10px 14px;
+  }
+
+  .app-header {
+    gap: 6px;
+  }
+
+  .title-area h1 {
+    font-size: 1.1rem;
+  }
+
+  .subtitle {
+    font-size: 0.7rem;
+  }
+
+  .btn,
+  .btn-primary {
+    width: 100%;
+    text-align: center;
+  }
+
+  .actions-row {
+    flex-direction: column;
+  }
+}

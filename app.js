@@ -45,7 +45,6 @@ async function carregarExamesFixos() {
     if (statusExamesEl) {
       statusExamesEl.textContent = `Exames carregados com sucesso de "${EXAMES_ARQUIVO}".`;
     }
-    alert('Exames carregados com sucesso a partir de "exames.xlsx"!');
   } catch (erro) {
     console.error('Erro ao carregar exames:', erro);
     if (statusExamesEl) {
@@ -382,3 +381,4 @@ function renderizarCarrinho() {
     });
   });
 }
+

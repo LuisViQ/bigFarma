@@ -85,6 +85,7 @@
         <!-- Linha de seleção do exame -->
         <section class="section">
           <h2>2. Adicionar exame ao carrinho</h2>
+
           <div class="form-grid">
             <div class="form-group">
               <label for="produtoNome">Exame</label>
@@ -112,6 +113,20 @@
               <label for="produtoQtd">Quantidade</label>
               <input id="produtoQtd" type="number" min="1" value="1" />
             </div>
+
+            <!-- NOVO: desconto por item -->
+            <div class="form-group">
+              <label for="descontoItemPct">Desconto do item (%)</label>
+              <input
+                id="descontoItemPct"
+                type="number"
+                min="0"
+                max="100"
+                step="0.01"
+                value="0"
+                placeholder="0"
+              />
+            </div>
           </div>
 
           <div class="actions-row">
@@ -126,6 +141,23 @@
         <!-- Tabela do carrinho -->
         <section class="section">
           <h2>3. Exames selecionados</h2>
+
+          <!-- NOVO: desconto geral -->
+          <div class="form-grid" style="margin-bottom: 12px">
+            <div class="form-group">
+              <label for="descontoTotalPct">Desconto no total (%)</label>
+              <input
+                id="descontoTotalPct"
+                type="number"
+                min="0"
+                max="100"
+                step="0.01"
+                value="0"
+                placeholder="0"
+              />
+            </div>
+          </div>
+
           <div class="table-wrapper">
             <table class="cart-table">
               <thead>
@@ -134,15 +166,26 @@
                   <th>Exame</th>
                   <th>Valor</th>
                   <th>Qtd</th>
+                  <th>Desc.%</th>
                   <th>Subtotal</th>
                   <th>Ações</th>
                 </tr>
               </thead>
+
               <tbody id="tbodyCarrinho"></tbody>
+
               <tfoot>
                 <tr>
-                  <td colspan="4" class="total-label">Total</td>
+                  <td colspan="5" class="total-label">Total (c/ desconto por item)</td>
                   <td id="totalGeral" class="total-value">0.00</td>
+                  <td></td>
+                </tr>
+
+                <tr>
+                  <td colspan="5" class="total-label">
+                    Total final (c/ desconto geral)
+                  </td>
+                  <td id="totalFinal" class="total-value">0.00</td>
                   <td></td>
                 </tr>
               </tfoot>
@@ -164,4 +207,3 @@
     <script src="app.js"></script>
   </body>
 </html>
-

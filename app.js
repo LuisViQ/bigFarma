@@ -154,6 +154,21 @@ function popularDatalist() {
 }
 
 // ===============================
+//   Helpers desconto (%)
+// ===============================
+function lerPercentual(valor) {
+  let n = parseFloat(String(valor).replace(',', '.'));
+  if (isNaN(n)) n = 0;
+  if (n < 0) n = 0;
+  if (n > 100) n = 100;
+  return n;
+}
+
+function aplicarDesconto(valor, pct) {
+  return valor * (1 - pct / 100);
+}
+
+// ===============================
 //   Interação do carrinho
 // ===============================
 const inputNome = document.getElementById('produtoNome');
@@ -163,6 +178,13 @@ const btnAdicionar = document.getElementById('btnAdicionar');
 const tbodyCarrinho = document.getElementById('tbodyCarrinho');
 const totalGeralTd = document.getElementById('totalGeral');
 const btnExportarPdf = document.getElementById('btnExportarPdf');
+
+// NOVO: desconto por item e desconto geral
+const inputDescontoItemPct = document.getElementById('descontoItemPct');   // <input id="descontoItemPct">
+const inputDescontoTotalPct = document.getElementById('descontoTotalPct'); // <input id="descontoTotalPct">
+const totalFinalTd = document.getElementById('totalFinal');               // <td id="totalFinal"> (opcional)
+
+let descontoTotalPct = 0;
 
 // NOVO: campos do cliente
 const inputClienteNome = document.getElementById('clienteNome');
@@ -174,6 +196,14 @@ const inputClienteObs = document.getElementById('clienteObs');
 inputNome.addEventListener('input', aoAlterarProduto);
 btnAdicionar.addEventListener('click', adicionarAoCarrinho);
 btnExportarPdf.addEventListener('click', exportarSomenteTabela);
+
+// Atualiza desconto geral ao digitar
+if (inputDescontoTotalPct) {
+  inputDescontoTotalPct.addEventListener('input', () => {
+    descontoTotalPct = lerPercentual(inputDescontoTotalPct.value);
+    renderizarCarrinho();
+  });
+}
 
 // ===============================
 //   Exportar só a tabela para PDF + dados do cliente
@@ -198,7 +228,6 @@ function exportarSomenteTabela() {
 
   let dataPedido;
   if (inputClienteData && inputClienteData.value) {
-    // valor do input date vem como "YYYY-MM-DD"
     dataPedido = new Date(
       inputClienteData.value + 'T00:00:00'
     ).toLocaleDateString('pt-BR');
@@ -211,32 +240,13 @@ function exportarSomenteTabela() {
 
   const estilo = `
     <style>
-      body {
-        font-family: Arial, sans-serif;
-        font-size: 14px;
-      }
-      h1, h2 {
-        margin: 4px 0;
-      }
-      .cliente-bloco {
-        margin-bottom: 16px;
-      }
-      .cliente-bloco p {
-        margin: 2px 0;
-      }
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 14px;
-      }
-      th, td {
-        border: 1px solid #555;
-        padding: 6px;
-        text-align: left;
-      }
-      th {
-        background: #eee;
-      }
+      body { font-family: Arial, sans-serif; font-size: 14px; }
+      h1, h2 { margin: 4px 0; }
+      .cliente-bloco { margin-bottom: 16px; }
+      .cliente-bloco p { margin: 2px 0; }
+      table { width: 100%; border-collapse: collapse; font-size: 14px; }
+      th, td { border: 1px solid #555; padding: 6px; text-align: left; }
+      th { background: #eee; }
     </style>
   `;
 
@@ -326,21 +336,29 @@ function adicionarAoCarrinho() {
     return;
   }
 
+  const descontoItemPct = inputDescontoItemPct
+    ? lerPercentual(inputDescontoItemPct.value)
+    : 0;
+
   const existente = carrinho.find((item) => item.codigo === produto.codigo);
   if (existente) {
     existente.qtd += qtd;
+    // se você quiser atualizar o desconto ao adicionar de novo:
+    existente.descontoPct = descontoItemPct;
   } else {
     carrinho.push({
       codigo: produto.codigo,
       nome: produto.nome,
       preco: produto.preco,
       qtd: qtd,
+      descontoPct: descontoItemPct,
     });
   }
 
   inputNome.value = '';
   inputPreco.value = '';
   inputQtd.value = 1;
+  if (inputDescontoItemPct) inputDescontoItemPct.value = 0;
 
   renderizarCarrinho();
 }
@@ -352,26 +370,39 @@ function removerItem(codigo) {
 
 function renderizarCarrinho() {
   tbodyCarrinho.innerHTML = '';
-  let total = 0;
+
+  let totalBruto = 0;        // sem descontos
+  let totalComItem = 0;      // com desconto por item (sem o desconto geral)
 
   carrinho.forEach((item) => {
     const tr = document.createElement('tr');
-    const subtotal = item.preco * item.qtd;
-    total += subtotal;
+
+    const subtotalBruto = item.preco * item.qtd;
+    totalBruto += subtotalBruto;
+
+    const descPct = lerPercentual(item.descontoPct);
+    const subtotalComDescontoItem = aplicarDesconto(subtotalBruto, descPct);
+    totalComItem += subtotalComDescontoItem;
 
     tr.innerHTML = `
       <td>${item.codigo}</td>
       <td>${item.nome}</td>
       <td>${item.preco.toFixed(2)}</td>
       <td>${item.qtd}</td>
-      <td>${subtotal.toFixed(2)}</td>
+      <td>${descPct.toFixed(2)}%</td>
+      <td>${subtotalComDescontoItem.toFixed(2)}</td>
       <td><button class="btn-remover" data-codigo="${item.codigo}">Remover</button></td>
     `;
 
     tbodyCarrinho.appendChild(tr);
   });
 
-  totalGeralTd.textContent = total.toFixed(2);
+  // Total "geral" aqui vira o total após desconto por item
+  totalGeralTd.textContent = totalComItem.toFixed(2);
+
+  // Total final aplica desconto geral em cima do total já com desconto por item
+  const totalFinal = aplicarDesconto(totalComItem, descontoTotalPct);
+  if (totalFinalTd) totalFinalTd.textContent = totalFinal.toFixed(2);
 
   const botoesRemover = tbodyCarrinho.querySelectorAll('.btn-remover');
   botoesRemover.forEach((btn) => {
@@ -381,4 +412,3 @@ function renderizarCarrinho() {
     });
   });
 }
-

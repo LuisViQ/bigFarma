@@ -190,6 +190,7 @@ let descontoTotalPct = 0;
 const inputClienteNome = document.getElementById('clienteNome');
 const inputClienteDocumento = document.getElementById('clienteDocumento');
 const inputClienteTelefone = document.getElementById('clienteTelefone');
+const inputDataNascimentoCliente = document.getElementById('clienteDataNascimento')
 const inputClienteData = document.getElementById('clienteData');
 const inputClienteObs = document.getElementById('clienteObs');
 
@@ -225,7 +226,14 @@ function exportarSomenteTabela() {
   const telCliente =
     (inputClienteTelefone && inputClienteTelefone.value.trim()) ||
     'Não informado';
-
+  let dataNascimento;
+  if (inputDataNascimentoCliente && inputDataNascimentoCliente.value) {
+    dataNascimento = new Date(
+      inputDataNascimentoCliente.value + 'T00:00:00'
+    ).toLocaleDateString('pt-BR');
+  } else {
+    dataNascimento = "Não informado"
+  }
   let dataPedido;
   if (inputClienteData && inputClienteData.value) {
     dataPedido = new Date(
@@ -264,6 +272,7 @@ function exportarSomenteTabela() {
         <div class="cliente-bloco">
           <p><strong>Paciente:</strong> ${nomeCliente}</p>
           <p><strong>Documento:</strong> ${docCliente}</p>
+          <p><strong>Data de Nascimento:</strong> ${dataNascimento}</p>
           <p><strong>Telefone:</strong> ${telCliente}</p>
           <p><strong>Data do pedido:</strong> ${dataPedido}</p>
           ${

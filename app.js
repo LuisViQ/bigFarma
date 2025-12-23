@@ -87,6 +87,21 @@ function normalizaTexto(s) {
 }
 
 // ===============================
+//   Extrair código quando vier "CODIGO - NOME"
+//   Aceita hífen normal (-) e travessão/en dash (– —)
+// ===============================
+function extrairCodigoDoTexto(texto) {
+  const raw = String(texto || '').trim();
+  if (!raw) return '';
+
+  // pega o que vem antes do primeiro separador " - " (ou variações)
+  const m = raw.match(/^\s*([^\-–—]+?)\s*[-–—]\s*(.+)\s*$/);
+  if (m && m[1]) return String(m[1]).trim();
+
+  return '';
+}
+
+// ===============================
 //   Parse Excel (linhas já em array) - CODIGO / EXAME / VALOR
 // ===============================
 function parseExcelRows(rows) {
@@ -153,46 +168,61 @@ function parseExcelRows(rows) {
 }
 
 // ===============================
-//   Datalist de exames
+//   Datalist de exames (AGORA: "CODIGO - NOME")
 // ===============================
 function popularDatalist() {
   const lista = document.getElementById('listaProdutos');
   lista.innerHTML = '';
 
-  // Mantive só o nome no autocomplete
   produtos.forEach((p) => {
     const opt = document.createElement('option');
-    opt.value = p.nome;
+    const cod = String(p.codigo || '').trim();
+    const nome = String(p.nome || '').trim();
+    opt.value = cod ? `${cod} - ${nome}` : nome;
     lista.appendChild(opt);
   });
 }
 
 // ===============================
 //   Busca: nome OU código (exato e parcial) IGNORANDO ACENTOS
+//   Aceita também texto do datalist: "CODIGO - NOME"
 // ===============================
 function encontrarProdutoPorTexto(texto) {
-  const t = normalizaTexto(texto);
-  if (!t) return null;
+  const raw = String(texto || '').trim();
+  if (!raw) return null;
 
-  // 1) Match EXATO: nome (sem acento) ou código
+  // Se veio no formato "CODIGO - NOME", tenta usar o código primeiro
+  const codigoExtraido = extrairCodigoDoTexto(raw);
+  if (codigoExtraido) {
+    const codNorm = codigoExtraido.trim().toLowerCase();
+    const achouPorCodigo = produtos.find(
+      (x) => String(x.codigo || '').trim().toLowerCase() === codNorm
+    );
+    if (achouPorCodigo) return achouPorCodigo;
+  }
+
+  // Caso geral: normaliza pra comparar nome sem acento
+  const t = normalizaTexto(raw);
+
+  // 1) EXATO: nome (sem acento) ou código
   let p = produtos.find((x) => {
     if (!x) return false;
 
     const nome = normalizaTexto(x.nome);
     const codigo = String(x.codigo || '').trim().toLowerCase();
 
-    return nome === t || codigo === t;
+    return nome === t || codigo === raw.trim().toLowerCase();
   });
   if (p) return p;
 
-  // 2) Match PARCIAL: nome contém (sem acento) ou código contém
+  // 2) PARCIAL: nome contém (sem acento) ou código contém
   p = produtos.find((x) => {
     if (!x) return false;
 
     const nome = normalizaTexto(x.nome);
     const codigo = String(x.codigo || '').trim().toLowerCase();
 
-    return nome.includes(t) || codigo.includes(t);
+    return nome.includes(t) || codigo.includes(raw.trim().toLowerCase());
   });
 
   return p || null;
@@ -224,14 +254,13 @@ const tbodyCarrinho = document.getElementById('tbodyCarrinho');
 const totalGeralTd = document.getElementById('totalGeral');
 const btnExportarPdf = document.getElementById('btnExportarPdf');
 
-// NOVO: desconto por item e desconto geral
 const inputDescontoItemPct = document.getElementById('descontoItemPct');
 const inputDescontoTotalPct = document.getElementById('descontoTotalPct');
 const totalFinalTd = document.getElementById('totalFinal');
 
 let descontoTotalPct = 0;
 
-// NOVO: campos do cliente
+// campos do cliente
 const inputClienteNome = document.getElementById('clienteNome');
 const inputClienteDocumento = document.getElementById('clienteDocumento');
 const inputClienteTelefone = document.getElementById('clienteTelefone');
@@ -243,7 +272,6 @@ inputNome.addEventListener('input', aoAlterarProduto);
 btnAdicionar.addEventListener('click', adicionarAoCarrinho);
 btnExportarPdf.addEventListener('click', exportarSomenteTabela);
 
-// Atualiza desconto geral ao digitar
 if (inputDescontoTotalPct) {
   inputDescontoTotalPct.addEventListener('input', () => {
     descontoTotalPct = lerPercentual(inputDescontoTotalPct.value);
@@ -360,7 +388,7 @@ function aoAlterarProduto() {
 }
 
 function adicionarAoCarrinho() {
-  const textoDigitado = inputNome.value; // nome OU código
+  const textoDigitado = inputNome.value; // nome, código ou "código - nome"
   const qtd = parseInt(inputQtd.value, 10);
 
   if (!produtos.length) {
@@ -419,14 +447,12 @@ function removerItem(codigo) {
 function renderizarCarrinho() {
   tbodyCarrinho.innerHTML = '';
 
-  let totalBruto = 0;
   let totalComItem = 0;
 
   carrinho.forEach((item) => {
     const tr = document.createElement('tr');
 
     const subtotalBruto = item.preco * item.qtd;
-    totalBruto += subtotalBruto;
 
     const descPct = lerPercentual(item.descontoPct);
     const subtotalComDescontoItem = aplicarDesconto(subtotalBruto, descPct);

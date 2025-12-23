@@ -75,6 +75,18 @@ function normalizaCabecalho(s) {
 }
 
 // ===============================
+//   Normalização de texto (IGNORA ACENTOS)
+// ===============================
+function normalizaTexto(s) {
+  return String(s || '')
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')                    // separa acento do caractere
+    .replace(/[\u0300-\u036f]/g, '')     // remove acentos
+    .replace(/\s+/g, ' ');              // colapsa espaços
+}
+
+// ===============================
 //   Parse Excel (linhas já em array) - CODIGO / EXAME / VALOR
 // ===============================
 function parseExcelRows(rows) {
@@ -146,11 +158,44 @@ function parseExcelRows(rows) {
 function popularDatalist() {
   const lista = document.getElementById('listaProdutos');
   lista.innerHTML = '';
+
+  // Mantive só o nome no autocomplete
   produtos.forEach((p) => {
     const opt = document.createElement('option');
-    opt.value = p.nome; // só o nome do exame
+    opt.value = p.nome;
     lista.appendChild(opt);
   });
+}
+
+// ===============================
+//   Busca: nome OU código (exato e parcial) IGNORANDO ACENTOS
+// ===============================
+function encontrarProdutoPorTexto(texto) {
+  const t = normalizaTexto(texto);
+  if (!t) return null;
+
+  // 1) Match EXATO: nome (sem acento) ou código
+  let p = produtos.find((x) => {
+    if (!x) return false;
+
+    const nome = normalizaTexto(x.nome);
+    const codigo = String(x.codigo || '').trim().toLowerCase();
+
+    return nome === t || codigo === t;
+  });
+  if (p) return p;
+
+  // 2) Match PARCIAL: nome contém (sem acento) ou código contém
+  p = produtos.find((x) => {
+    if (!x) return false;
+
+    const nome = normalizaTexto(x.nome);
+    const codigo = String(x.codigo || '').trim().toLowerCase();
+
+    return nome.includes(t) || codigo.includes(t);
+  });
+
+  return p || null;
 }
 
 // ===============================
@@ -180,9 +225,9 @@ const totalGeralTd = document.getElementById('totalGeral');
 const btnExportarPdf = document.getElementById('btnExportarPdf');
 
 // NOVO: desconto por item e desconto geral
-const inputDescontoItemPct = document.getElementById('descontoItemPct');   // <input id="descontoItemPct">
-const inputDescontoTotalPct = document.getElementById('descontoTotalPct'); // <input id="descontoTotalPct">
-const totalFinalTd = document.getElementById('totalFinal');               // <td id="totalFinal"> (opcional)
+const inputDescontoItemPct = document.getElementById('descontoItemPct');
+const inputDescontoTotalPct = document.getElementById('descontoTotalPct');
+const totalFinalTd = document.getElementById('totalFinal');
 
 let descontoTotalPct = 0;
 
@@ -190,7 +235,7 @@ let descontoTotalPct = 0;
 const inputClienteNome = document.getElementById('clienteNome');
 const inputClienteDocumento = document.getElementById('clienteDocumento');
 const inputClienteTelefone = document.getElementById('clienteTelefone');
-const inputDataNascimentoCliente = document.getElementById('clienteDataNascimento')
+const inputDataNascimentoCliente = document.getElementById('clienteDataNascimento');
 const inputClienteData = document.getElementById('clienteData');
 const inputClienteObs = document.getElementById('clienteObs');
 
@@ -217,23 +262,22 @@ function exportarSomenteTabela() {
 
   const tabela = document.querySelector('.cart-table').outerHTML;
 
-  // Pega dados do cliente
   const nomeCliente =
     (inputClienteNome && inputClienteNome.value.trim()) || 'Não informado';
   const docCliente =
-    (inputClienteDocumento && inputClienteDocumento.value.trim()) ||
-    'Não informado';
+    (inputClienteDocumento && inputClienteDocumento.value.trim()) || 'Não informado';
   const telCliente =
-    (inputClienteTelefone && inputClienteTelefone.value.trim()) ||
-    'Não informado';
+    (inputClienteTelefone && inputClienteTelefone.value.trim()) || 'Não informado';
+
   let dataNascimento;
   if (inputDataNascimentoCliente && inputDataNascimentoCliente.value) {
     dataNascimento = new Date(
       inputDataNascimentoCliente.value + 'T00:00:00'
     ).toLocaleDateString('pt-BR');
   } else {
-    dataNascimento = "Não informado"
+    dataNascimento = 'Não informado';
   }
+
   let dataPedido;
   if (inputClienteData && inputClienteData.value) {
     dataPedido = new Date(
@@ -298,16 +342,14 @@ function exportarSomenteTabela() {
 //   Lógica dos inputs
 // ===============================
 function aoAlterarProduto() {
-  const nomeDigitado = inputNome.value.trim().toLowerCase();
+  const texto = inputNome.value;
 
-  if (!nomeDigitado) {
+  if (!texto || !texto.trim()) {
     inputPreco.value = '';
     return;
   }
 
-  const produto = produtos.find(
-    (p) => p && p.nome && p.nome.toLowerCase() === nomeDigitado
-  );
+  const produto = encontrarProdutoPorTexto(texto);
 
   if (!produto) {
     inputPreco.value = '';
@@ -318,7 +360,7 @@ function aoAlterarProduto() {
 }
 
 function adicionarAoCarrinho() {
-  const nomeDigitado = inputNome.value.trim().toLowerCase();
+  const textoDigitado = inputNome.value; // nome OU código
   const qtd = parseInt(inputQtd.value, 10);
 
   if (!produtos.length) {
@@ -326,17 +368,15 @@ function adicionarAoCarrinho() {
     return;
   }
 
-  if (!nomeDigitado) {
-    alert('Digite ou selecione um exame.');
+  if (!textoDigitado || !textoDigitado.trim()) {
+    alert('Digite ou selecione um exame (nome ou código).');
     return;
   }
 
-  const produto = produtos.find(
-    (p) => p && p.nome && p.nome.toLowerCase() === nomeDigitado
-  );
+  const produto = encontrarProdutoPorTexto(textoDigitado);
 
   if (!produto) {
-    alert('Exame não encontrado. Confira o nome ou o arquivo de exames.');
+    alert('Exame não encontrado. Confira nome/código ou o arquivo de exames.');
     return;
   }
 
@@ -352,7 +392,6 @@ function adicionarAoCarrinho() {
   const existente = carrinho.find((item) => item.codigo === produto.codigo);
   if (existente) {
     existente.qtd += qtd;
-    // se você quiser atualizar o desconto ao adicionar de novo:
     existente.descontoPct = descontoItemPct;
   } else {
     carrinho.push({
@@ -380,8 +419,8 @@ function removerItem(codigo) {
 function renderizarCarrinho() {
   tbodyCarrinho.innerHTML = '';
 
-  let totalBruto = 0;        // sem descontos
-  let totalComItem = 0;      // com desconto por item (sem o desconto geral)
+  let totalBruto = 0;
+  let totalComItem = 0;
 
   carrinho.forEach((item) => {
     const tr = document.createElement('tr');
@@ -406,10 +445,8 @@ function renderizarCarrinho() {
     tbodyCarrinho.appendChild(tr);
   });
 
-  // Total "geral" aqui vira o total após desconto por item
   totalGeralTd.textContent = totalComItem.toFixed(2);
 
-  // Total final aplica desconto geral em cima do total já com desconto por item
   const totalFinal = aplicarDesconto(totalComItem, descontoTotalPct);
   if (totalFinalTd) totalFinalTd.textContent = totalFinal.toFixed(2);
 

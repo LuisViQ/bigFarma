@@ -1,17 +1,18 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <title>BigFarma – Exames com Excel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BigFarma - Exames com Excel</title>
     <link rel="stylesheet" href="styles.css" />
-    <link rel="icon" type="image/png" href="favicon.ico" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
   </head>
   <body>
     <div class="app-container">
       <header class="app-header">
         <div class="logo-area-left">
           <div class="logo-placeholder">
-            <img src="logo_big_farma.jpg" alt="Logo 1" />
+            <img src="logo_big_farma.jpg" alt="Logo BigFarma" />
           </div>
         </div>
 
@@ -22,21 +23,16 @@
 
         <div class="logo-area-right">
           <div class="logo-placeholder">
-            <img src="logo_crd.jpg" alt="Logo 2" />
+            <img src="logo_crd.jpg" alt="Logo CRD" />
           </div>
         </div>
       </header>
 
       <main class="card">
-        <!-- Informação sobre o arquivo fixo -->
         <section class="section">
-          <h2>1. Informações do Cliente</h2>
-          <p class="section-text">
-            Digite as informações do <strong> cliente </strong>
-          </p>
+          <h2>1. Informações do cliente</h2>
+          <p class="section-text">Digite as informações do cliente.</p>
           <p id="statusExames" class="section-text"></p>
-
-          <!-- NOVO: dados do cliente -->
           <div class="form-grid">
             <div class="form-group">
               <label for="clienteNome">Nome do paciente</label>
@@ -48,22 +44,28 @@
             </div>
 
             <div class="form-group">
-              <label for="clienteDocumento">Documento / CPF</label>
+              <label for="clienteDocumento">CPF</label>
               <input
                 id="clienteDocumento"
                 type="text"
-                placeholder="CPF ou outro documento"
+                inputmode="numeric"
+                maxlength="14"
+                placeholder="000.000.000-00"
               />
             </div>
+
             <div class="form-group">
-              <label for="clienteDataNascimento">Data de Nascimento</label>
+              <label for="clienteDataNascimento">Data de nascimento</label>
               <input id="clienteDataNascimento" type="date" />
             </div>
+
             <div class="form-group">
               <label for="clienteTelefone">Telefone / WhatsApp</label>
               <input
                 id="clienteTelefone"
                 type="text"
+                inputmode="tel"
+                maxlength="15"
                 placeholder="(99) 9 9999-9999"
               />
             </div>
@@ -75,18 +77,17 @@
           </div>
 
           <div class="form-group" style="margin-top: 12px">
-            <label for="clienteObs">Observações</label>
+            <label for="clienteObs">Observaçõs</label>
             <textarea
               id="clienteObs"
               rows="3"
-              placeholder="Ex: jejum, uso de medicação, orientações especiais"
+              placeholder="Ex: jejum, uso de medicacao, orientações especiais"
             ></textarea>
           </div>
         </section>
 
         <hr class="divider" />
 
-        <!-- Linha de seleção do exame -->
         <section class="section">
           <h2>2. Adicionar exame ao carrinho</h2>
 
@@ -118,7 +119,6 @@
               <input id="produtoQtd" type="number" min="1" value="1" />
             </div>
 
-            <!-- NOVO: desconto por item -->
             <div class="form-group">
               <label for="descontoItemPct">Desconto do item (%)</label>
               <input
@@ -142,11 +142,9 @@
 
         <hr class="divider" />
 
-        <!-- Tabela do carrinho -->
         <section class="section">
           <h2>3. Exames selecionados</h2>
 
-          <!-- NOVO: desconto geral -->
           <div class="form-grid" style="margin-bottom: 12px">
             <div class="form-group">
               <label for="descontoTotalPct">Desconto no total (%)</label>
@@ -166,7 +164,7 @@
             <table class="cart-table">
               <thead>
                 <tr>
-                  <th>Código</th>
+                  <th>CÃ³digo</th>
                   <th>Exame</th>
                   <th>Valor</th>
                   <th>Qtd</th>
@@ -186,7 +184,6 @@
                   <td id="totalGeral" class="total-value">0.00</td>
                   <td></td>
                 </tr>
-
                 <tr>
                   <td colspan="5" class="total-label">
                     Total final (c/ desconto geral)
@@ -198,18 +195,34 @@
             </table>
           </div>
 
-          <div class="actions-row" style="margin-top: 16px">
-            <button id="btnExportarPdf" class="btn">Exportar para PDF</button>
+          <div class="actions-row actions-row-wrap" style="margin-top: 16px">
+            <button id="btnExportarPdf" class="btn">Imprimir</button>
+            <button id="btnExportarPdfNativo" class="btn btn-secondary">
+              Baixar PDF
+            </button>
+            <button id="btnExportarHistorico" class="btn btn-outline">
+              Exportar historico
+            </button>
+            <button id="btnLimparCarrinho" class="btn btn-danger">
+              Limpar carrinho
+            </button>
           </div>
+          <p
+            id="feedbackMensagem"
+            class="feedback-message"
+            aria-live="polite"
+          ></p>
         </section>
       </main>
 
       <footer class="app-footer">
-        <span>© Luis Queiroz 2025</span>
+        <span>&copy; Luis Queiroz 2025</span>
       </footer>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <script src="app.v1.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.4/dist/jspdf.plugin.autotable.min.js"></script>
+    <script src="app.v2.js"></script>
   </body>
 </html>

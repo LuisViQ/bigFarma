@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/status-em%20desenvolvimento-2ea44f" alt="status" />
+  <img src="https://img.shields.io/badge/status-v1%20funcional-2ea44f" alt="status" />
   <img src="https://img.shields.io/badge/stack-HTML%20%7C%20CSS%20%7C%20JavaScript-1f6feb" alt="stack" />
   <img src="https://img.shields.io/badge/dados-Excel%20(XLSX)-217346" alt="excel" />
   <img src="https://img.shields.io/badge/deploy-local%20server-orange" alt="deploy" />
@@ -24,6 +24,7 @@
 - [Formato da planilha](#formato-da-planilha)
 - [Fluxo da tela](#fluxo-da-tela)
 - [Regras de calculo](#regras-de-calculo)
+- [Limites e desempenho](#limites-e-desempenho)
 - [Roadmap](#roadmap)
 - [Solucao de problemas](#solucao-de-problemas)
 - [Autor](#autor)
@@ -36,7 +37,10 @@ O BigFarma e uma aplicacao web estatica para atendimento de pacientes em pedidos
 - Busca exame por nome, codigo ou formato `CODIGO - NOME`.
 - Controla carrinho com quantidade e desconto por item.
 - Aplica desconto geral no total.
-- Exporta para impressao/PDF via `window.print()`.
+- Preenche automaticamente a data do pedido (quando vazia).
+- Persiste dados no navegador com `localStorage`.
+- Exporta por impressao, PDF nativo e historico em JSON.
+- Todas as exportacoes de documento sao em preto e branco (P&B).
 
 ## Demo local
 
@@ -61,10 +65,13 @@ Opcao alternativa: Live Server (VS Code).
 |------|-----------|
 | Carga de dados | Le `exames-v1.xlsx` automaticamente ao iniciar |
 | Busca | Normaliza texto e ignora acentos |
-| Paciente | Coleta nome, documento, nascimento, telefone, data e observacoes |
-| Carrinho | Adiciona, remove e recalcula itens em tempo real |
+| Paciente | Coleta nome, CPF, nascimento, telefone, data e observacoes |
+| Validacao | Aplica mascara/validacao de CPF e telefone |
+| Carrinho | Adiciona, remove, limpa e recalcula itens em tempo real |
 | Descontos | Item (%) e total (%) com limite entre 0 e 100 |
-| Exportacao | Gera layout de impressao com dados do paciente e tabela |
+| Persistencia | Salva cliente, carrinho e desconto total no `localStorage` |
+| Feedback | Exibe avisos de erro/sucesso em popup abaixo dos botoes de exportacao |
+| Exportacao | Imprime pedido, gera PDF nativo (`jsPDF`) com layout equivalente e exporta historico em JSON (P&B) |
 
 ## Arquitetura rapida
 
@@ -72,7 +79,7 @@ Opcao alternativa: Live Server (VS Code).
 bigFarma/
 |- index.html           # Estrutura da interface
 |- styles.css           # Tema visual + responsividade
-|- app.v1.js            # Regras de negocio e interacoes
+|- app.v2.js            # Regras de negocio e interacoes
 |- exames-v1.xlsx       # Base de exames
 |- logo_big_farma.jpg   # Identidade visual principal
 |- logo_crd.jpg         # Logo secundaria
@@ -109,8 +116,11 @@ Regras:
 3. Informe quantidade e desconto do item.
 4. Clique em `Adicionar exame`.
 5. (Opcional) ajuste desconto no total.
-6. Clique em `Exportar para PDF`.
-7. Na janela de impressao, escolha `Salvar como PDF` ou impressora.
+6. Escolha uma acao:
+   - `Imprimir` para abrir a tela de impressao
+   - `Baixar PDF` para gerar PDF nativo
+   - `Exportar historico` para baixar historico em JSON
+7. Use `Limpar carrinho` quando quiser reiniciar o pedido.
 
 ## Regras de calculo
 
@@ -119,18 +129,41 @@ Regras:
 - `totalGeral = soma(subtotalComDescontoItem)`
 - `totalFinal = totalGeral * (1 - descontoTotal/100)`
 
+## Limites e desempenho
+
+Para evitar travamento por crescimento de dados no navegador:
+
+- Historico limitado a `100` pedidos.
+- Tamanho maximo do historico em `~700 KB` no `localStorage`.
+- Limite de `120` itens por pedido salvo no historico.
+- Fallback automatico para `30` pedidos quando houver erro de cota.
+
 ## Roadmap
+
+### Fase 1 - Base do produto (Concluida)
 
 - [x] Leitura de exames por Excel
 - [x] Busca por codigo/nome com normalizacao
 - [x] Carrinho com desconto por item
 - [x] Desconto geral no pedido
-- [x] Exportacao por impressao/PDF
-- [ ] Persistencia em `localStorage`
-- [ ] Mascara e validacao de CPF/telefone
-- [ ] Botao de limpar carrinho
-- [ ] PDF nativo em codigo (ex.: `jsPDF`)
-- [ ] Suite de testes para parser/calculos
+- [x] Exportacao por impressao
+
+### Fase 2 - Fechamento da V1 para GitHub Pages (Concluida)
+
+- [x] Persistencia em `localStorage`
+- [x] Mascara e validacao de CPF/telefone
+- [x] Botao de limpar carrinho
+- [x] Confirmacao visual para erros e sucesso nas acoes principais
+
+### Fase 3 - Evolucao de documentos no front-end (Concluida)
+
+- [x] PDF nativo em codigo (`jsPDF`)
+- [x] Layout de impressao com cabecalho/rodape institucional
+- [x] Opcao de exportar historico de pedidos
+
+### Fora do escopo de runtime GitHub Pages puro
+
+- Testes automatizados e lint ficam como tarefa de pipeline/CI (opcional).
 
 ## Solucao de problemas
 
@@ -140,6 +173,9 @@ Regras:
 - Exame nao encontrado:
   - Revise codigo/nome na planilha.
   - Tente busca parcial.
+- Historico muito grande:
+  - O sistema reduz automaticamente a quantidade de registros para manter estabilidade.
+  - Exporte o historico em JSON periodicamente para arquivamento externo.
 - Texto com acentuacao quebrada:
   - Garanta arquivos em UTF-8.
 

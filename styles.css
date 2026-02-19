@@ -8,6 +8,7 @@
   --text-main: #e5e7eb;
   --text-muted: #9ca3af;
   --danger: #ef4444;
+  --info: #38bdf8;
   --radius-lg: 16px;
   --shadow-soft: 0 20px 40px rgba(0, 0, 0, 0.45);
 }
@@ -19,20 +20,18 @@
 body {
   margin: 0;
   min-height: 100vh;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   background: radial-gradient(circle at top, #1d283a, #020617 60%);
   color: var(--text-main);
   padding: 24px;
 }
 
-/* Layout principal */
 .app-container {
   width: 100%;
   max-width: 960px;
   margin: 0 auto;
 }
 
-/* Header */
 .app-header {
   display: flex;
   align-items: center;
@@ -41,7 +40,6 @@ body {
   justify-content: space-between;
 }
 
-/* Logos menores */
 .logo-area-left,
 .logo-area-right {
   width: 40px;
@@ -49,11 +47,6 @@ body {
   flex-shrink: 0;
 }
 
-.logo-area {
-  flex-shrink: 0;
-}
-
-/* Container da logo */
 .logo-placeholder {
   width: 40px;
   height: 40px;
@@ -62,15 +55,10 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--accent);
-  font-weight: 700;
-  font-size: 0.6rem;
-  text-transform: uppercase;
   overflow: hidden;
   padding: 2px;
 }
 
-/* Imagem da logo dentro do placeholder */
 .logo-placeholder img {
   width: 100%;
   height: 100%;
@@ -87,10 +75,9 @@ body {
 .subtitle {
   margin: 2px 0 0;
   color: var(--text-muted);
-  font-size: 0.8rem;
+  font-size: 0.82rem;
 }
 
-/* Card principal */
 .card {
   background: var(--bg-card);
   border-radius: var(--radius-lg);
@@ -100,7 +87,6 @@ body {
   backdrop-filter: blur(16px);
 }
 
-/* Sections */
 .section + .section {
   margin-top: 16px;
 }
@@ -116,45 +102,76 @@ body {
   color: var(--text-muted);
 }
 
-/* Divider */
+.feedback-message {
+  display: none;
+  width: min(100%, 520px);
+  margin: 12px auto 0;
+  min-height: 22px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid transparent;
+  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  transform: translateY(-8px) scale(0.98);
+  transition: opacity 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  pointer-events: none;
+  text-align: center;
+}
+
+.feedback-message.is-visible {
+  display: block;
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.45);
+}
+
+.feedback-message.feedback-info {
+  color: #dbeafe;
+  background: rgba(56, 189, 248, 0.12);
+  border-color: rgba(56, 189, 248, 0.45);
+}
+
+.feedback-message.feedback-success {
+  color: #dcfce7;
+  background: rgba(34, 197, 94, 0.12);
+  border-color: rgba(34, 197, 94, 0.5);
+}
+
+.feedback-message.feedback-error {
+  color: #fee2e2;
+  background: rgba(239, 68, 68, 0.14);
+  border-color: rgba(239, 68, 68, 0.45);
+}
+
 .divider {
   border: none;
   border-top: 1px solid var(--border-color);
   margin: 18px 0;
 }
 
-/* Formulários */
-.form-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.form-row label {
-  min-width: 120px;
-  font-size: 0.9rem;
-  color: var(--text-muted);
-}
-
-.form-row input[type="file"] {
-  color: var(--text-main);
-}
-
-/* Grid para produto/preço/quantidade/desconto e dados */
 .form-grid {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr; /* EXAME | VALOR | QTD | DESC.% */
+  grid-template-columns: 2fr 1fr 1fr 1fr;
   gap: 12px;
 }
 
-/* (Opcional) deixar o desconto geral mais "compacto" */
 #descontoTotalPct {
   max-width: 220px;
 }
 
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.form-group label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
 textarea {
-  background: #0f172a;
+  background: var(--bg-input);
   border-radius: 12px;
   border: 1px solid rgba(148, 163, 184, 0.25);
   padding: 10px 12px;
@@ -173,18 +190,6 @@ textarea:focus {
   background: #101d33;
 }
 
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.form-group label {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-}
-
-/* Estilo para o seletor de data */
 input[type="date"] {
   background: var(--bg-input);
   border-radius: 10px;
@@ -194,21 +199,8 @@ input[type="date"] {
   font-size: 0.95rem;
   outline: none;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  appearance: none;
 }
 
-/* Ajusta o ícone/calendário (Chrome/Edge) */
-input[type="date"]::-webkit-calendar-picker-indicator {
-  filter: invert(1) opacity(0.7);
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-input[type="date"]::-webkit-calendar-picker-indicator:hover {
-  filter: invert(1) opacity(1);
-}
-
-/* Foco do seletor de data */
 input[type="date"]:focus {
   border-color: var(--accent);
   box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.4);
@@ -217,7 +209,7 @@ input[type="date"]:focus {
 input[type="text"],
 input[type="number"],
 input[list] {
-  background: #0f172a;
+  background: var(--bg-input);
   border-radius: 12px;
   border: 1px solid rgba(148, 163, 184, 0.25);
   padding: 12px 14px;
@@ -228,18 +220,11 @@ input[list] {
   transition: 0.2s ease-in-out;
 }
 
-#produtoNome {
-  appearance: none;
-  -webkit-appearance: none;
-}
-
-/* Hover */
 input[type="text"]:hover,
 input[type="number"]:hover {
   border-color: rgba(34, 197, 94, 0.35);
 }
 
-/* Focus bonito */
 input[type="text"]:focus,
 input[type="number"]:focus {
   border-color: var(--accent);
@@ -247,15 +232,21 @@ input[type="number"]:focus {
   background: #101d33;
 }
 
-/* Placeholder mais suave */
 input::placeholder {
   color: #94a3b8;
   opacity: 0.7;
 }
 
-/* Botões */
+.input-invalid {
+  border-color: rgba(239, 68, 68, 0.75) !important;
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.22) !important;
+}
+
 .actions-row {
   margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .btn {
@@ -287,7 +278,36 @@ input::placeholder {
   box-shadow: 0 6px 12px rgba(34, 197, 94, 0.35);
 }
 
-/* Botão remover */
+.btn-secondary {
+  background: rgba(56, 189, 248, 0.12);
+  color: #cdeefd;
+  border: 1px solid rgba(56, 189, 248, 0.4);
+}
+
+.btn-secondary:hover {
+  background: rgba(56, 189, 248, 0.2);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--text-main);
+  border: 1px solid rgba(148, 163, 184, 0.45);
+}
+
+.btn-outline:hover {
+  background: rgba(148, 163, 184, 0.15);
+}
+
+.btn-danger {
+  background: rgba(239, 68, 68, 0.12);
+  color: #fecaca;
+  border: 1px solid rgba(239, 68, 68, 0.5);
+}
+
+.btn-danger:hover {
+  background: rgba(239, 68, 68, 0.22);
+}
+
 .btn-remover {
   background: rgba(239, 68, 68, 0.08);
   color: var(--danger);
@@ -304,7 +324,6 @@ input::placeholder {
   transform: translateY(-1px);
 }
 
-/* Tabela do carrinho */
 .table-wrapper {
   overflow-x: auto;
 }
@@ -342,7 +361,6 @@ input::placeholder {
   background: rgba(30, 64, 175, 0.4);
 }
 
-/* NOVO: alinhar colunas numéricas à direita (Valor, Qtd, Desc.%, Subtotal) */
 .cart-table td:nth-child(3),
 .cart-table td:nth-child(4),
 .cart-table td:nth-child(5),
@@ -364,7 +382,6 @@ input::placeholder {
   color: var(--accent);
 }
 
-/* Footer */
 .app-footer {
   margin-top: 12px;
   text-align: right;
@@ -372,7 +389,6 @@ input::placeholder {
   color: var(--text-muted);
 }
 
-/* Responsivo - tablets / celulares maiores */
 @media (max-width: 768px) {
   body {
     padding: 12px;
@@ -408,10 +424,6 @@ input::placeholder {
     border-radius: 12px;
   }
 
-  .section {
-    margin-top: 10px;
-  }
-
   .section h2 {
     font-size: 1rem;
   }
@@ -423,20 +435,6 @@ input::placeholder {
   .form-grid {
     grid-template-columns: 1fr;
     gap: 10px;
-  }
-
-  .form-row {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-  }
-
-  .form-row label {
-    min-width: auto;
-  }
-
-  .table-wrapper {
-    margin-top: 8px;
   }
 
   .cart-table {
@@ -457,19 +455,11 @@ input::placeholder {
     font-size: 0.85rem;
   }
 
-  .actions-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  /* desconto geral volta a ocupar a largura toda no mobile */
   #descontoTotalPct {
     max-width: 100%;
   }
 }
 
-/* Responsivo - celulares pequenos */
 @media (max-width: 480px) {
   body {
     padding: 8px;
@@ -477,10 +467,6 @@ input::placeholder {
 
   .card {
     padding: 12px 10px 14px;
-  }
-
-  .app-header {
-    gap: 6px;
   }
 
   .title-area h1 {
@@ -499,5 +485,10 @@ input::placeholder {
 
   .actions-row {
     flex-direction: column;
+  }
+
+  .feedback-message {
+    width: 100%;
+    margin-top: 10px;
   }
 }

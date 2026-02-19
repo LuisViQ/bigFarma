@@ -1,87 +1,88 @@
-﻿# BigFarma
+# BigFarma
 
-Aplicação web estática para cadastro de paciente, seleção de exames a partir de uma planilha Excel e geração de pedido para impressão/PDF.
+<p align="center">
+  <img src="./logo_big_farma.jpg" alt="BigFarma logo" width="120" />
+</p>
 
-## Visão geral
+<p align="center">
+  Sistema web para montar pedidos de exames com base em Excel.
+</p>
 
-O BigFarma foi criado para facilitar o fluxo de atendimento de exames:
+<p align="center">
+  <img src="https://img.shields.io/badge/status-em%20desenvolvimento-2ea44f" alt="status" />
+  <img src="https://img.shields.io/badge/stack-HTML%20%7C%20CSS%20%7C%20JavaScript-1f6feb" alt="stack" />
+  <img src="https://img.shields.io/badge/dados-Excel%20(XLSX)-217346" alt="excel" />
+  <img src="https://img.shields.io/badge/deploy-local%20server-orange" alt="deploy" />
+</p>
 
-1. Carrega automaticamente uma planilha (`exames-v1.xlsx`).
-2. Permite buscar exames por código ou nome.
-3. Monta um carrinho com quantidade e desconto por item.
-4. Aplica desconto geral no total.
-5. Gera um documento pronto para impressão (ou salvar como PDF).
+## Indice
 
-## Funcionalidades
+- [Visao geral](#visao-geral)
+- [Demo local](#demo-local)
+- [Funcionalidades](#funcionalidades)
+- [Arquitetura rapida](#arquitetura-rapida)
+- [Formato da planilha](#formato-da-planilha)
+- [Fluxo da tela](#fluxo-da-tela)
+- [Regras de calculo](#regras-de-calculo)
+- [Roadmap](#roadmap)
+- [Solucao de problemas](#solucao-de-problemas)
+- [Autor](#autor)
 
-- Carregamento de exames via Excel usando `xlsx` (CDN).
-- Busca de exame por:
-  - Código (ex.: `1234`)
-  - Nome (com correspondência parcial)
-  - Formato combinado `CODIGO - NOME`
-- Busca sem acentos (normalização de texto).
-- Cadastro de dados do paciente:
-  - Nome
-  - Documento/CPF
-  - Data de nascimento
-  - Telefone/WhatsApp
-  - Data do pedido
-  - Observações
-- Carrinho de exames com:
-  - Quantidade
-  - Desconto por item (%)
-  - Remoção de item
-- Cálculo automático de:
-  - Total com desconto por item
-  - Total final com desconto geral
-- Exportação para impressão/PDF com dados do paciente + tabela de exames.
+## Visao geral
 
-## Stack
+O BigFarma e uma aplicacao web estatica para atendimento de pacientes em pedidos de exames.
 
-- HTML5
-- CSS3
-- JavaScript (Vanilla)
-- Biblioteca `xlsx` via CDN:
-  - `https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js`
+- Carrega os exames do arquivo `exames-v1.xlsx`.
+- Busca exame por nome, codigo ou formato `CODIGO - NOME`.
+- Controla carrinho com quantidade e desconto por item.
+- Aplica desconto geral no total.
+- Exporta para impressao/PDF via `window.print()`.
 
-## Estrutura do projeto
+## Demo local
 
-```text
-bigFarma/
-├─ index.html           # Estrutura da tela
-├─ styles.css           # Estilo e responsividade
-├─ app.v1.js            # Regras de negócio e interações
-├─ exames-v1.xlsx       # Base de exames
-├─ logo.png.jpg         # Logo esquerda
-├─ logo_crd.jpg         # Logo direita
-└─ README.md
-```
-
-## Pré-requisitos
-
-- Navegador moderno (Chrome, Edge, Firefox).
-- Servidor HTTP local para evitar bloqueio de `fetch` ao carregar o Excel.
-
-## Como executar localmente
-
-No PowerShell, dentro da pasta do projeto:
+1. Abra um terminal na pasta do projeto.
+2. Suba um servidor HTTP local.
+3. Acesse no navegador.
 
 ```powershell
 cd C:\Users\Admin\Desktop\bigFarma
 python -m http.server 8000
 ```
 
-Depois abra:
-
 ```text
 http://localhost:8000
 ```
 
-Alternativa no VS Code: usar extensão Live Server.
+Opcao alternativa: Live Server (VS Code).
 
-## Formato da planilha de exames
+## Funcionalidades
 
-O sistema lê apenas a primeira aba da planilha e espera cabeçalho na primeira linha com estas colunas:
+| Area | O que faz |
+|------|-----------|
+| Carga de dados | Le `exames-v1.xlsx` automaticamente ao iniciar |
+| Busca | Normaliza texto e ignora acentos |
+| Paciente | Coleta nome, documento, nascimento, telefone, data e observacoes |
+| Carrinho | Adiciona, remove e recalcula itens em tempo real |
+| Descontos | Item (%) e total (%) com limite entre 0 e 100 |
+| Exportacao | Gera layout de impressao com dados do paciente e tabela |
+
+## Arquitetura rapida
+
+```text
+bigFarma/
+|- index.html           # Estrutura da interface
+|- styles.css           # Tema visual + responsividade
+|- app.v1.js            # Regras de negocio e interacoes
+|- exames-v1.xlsx       # Base de exames
+|- logo_big_farma.jpg   # Identidade visual principal
+|- logo_crd.jpg         # Logo secundaria
+|- favicon.ico          # Icone do navegador
+`- README.md
+```
+
+## Formato da planilha
+
+A primeira aba deve ter cabecalho na primeira linha com:
 
 - `CODIGO`
 - `EXAME`
@@ -89,64 +90,58 @@ O sistema lê apenas a primeira aba da planilha e espera cabeçalho na primeira 
 
 Exemplo:
 
-| CODIGO | EXAME               | VALOR |
-|--------|---------------------|-------|
-| 1001   | Hemograma Completo  | 35,00 |
-| 2030   | Glicose             | 12,50 |
+| CODIGO | EXAME              | VALOR |
+|--------|--------------------|-------|
+| 1001   | Hemograma Completo | 35,00 |
+| 2030   | Glicose            | 12,50 |
 
-### Regras importantes da planilha
+Regras:
 
-- `EXAME` e `VALOR` são obrigatórios para cada linha.
-- `VALOR` pode vir como número ou texto (`35,00` / `R$ 35,00`).
-- Linhas com valor inválido são ignoradas.
-- Se faltar alguma coluna obrigatória, o carregamento falha com mensagem de erro.
+- `EXAME` e `VALOR` sao obrigatorios.
+- `VALOR` aceita numero ou texto (`35,00`, `R$ 35,00`).
+- Linhas invalidas sao ignoradas.
+- Cabecalho invalido gera erro de carregamento.
 
-## Fluxo de uso
+## Fluxo da tela
 
 1. Preencha os dados do paciente.
-2. Digite ou selecione um exame em `Exame`.
-3. Informe quantidade e desconto do item (se necessário).
+2. Digite/seleciona exame.
+3. Informe quantidade e desconto do item.
 4. Clique em `Adicionar exame`.
-5. (Opcional) Informe desconto geral no total.
-6. Clique em `Exportar para PDF` para abrir a versão de impressão.
-7. No diálogo do navegador, selecione `Salvar como PDF` (ou impressora física).
+5. (Opcional) ajuste desconto no total.
+6. Clique em `Exportar para PDF`.
+7. Na janela de impressao, escolha `Salvar como PDF` ou impressora.
 
-## Regras de cálculo
+## Regras de calculo
 
-- Subtotal por item:
-  - `preco * quantidade`
-  - com desconto de item: `subtotal * (1 - descontoItem/100)`
-- Total geral:
-  - soma dos subtotais já com desconto por item.
-- Total final:
-  - `totalGeral * (1 - descontoTotal/100)`
-- Descontos são limitados entre `0%` e `100%`.
+- `subtotalBruto = preco * quantidade`
+- `subtotalComDescontoItem = subtotalBruto * (1 - descontoItem/100)`
+- `totalGeral = soma(subtotalComDescontoItem)`
+- `totalFinal = totalGeral * (1 - descontoTotal/100)`
 
-## Comportamentos de destaque
+## Roadmap
 
-- Ao adicionar novamente o mesmo código de exame:
-  - a quantidade é somada.
-  - o desconto do item é atualizado para o último valor informado.
-- A exportação "PDF" é feita via nova janela + `window.print()`.
+- [x] Leitura de exames por Excel
+- [x] Busca por codigo/nome com normalizacao
+- [x] Carrinho com desconto por item
+- [x] Desconto geral no pedido
+- [x] Exportacao por impressao/PDF
+- [ ] Persistencia em `localStorage`
+- [ ] Mascara e validacao de CPF/telefone
+- [ ] Botao de limpar carrinho
+- [ ] PDF nativo em codigo (ex.: `jsPDF`)
+- [ ] Suite de testes para parser/calculos
 
-## Solução de problemas
+## Solucao de problemas
 
 - Erro ao carregar exames:
-  - confirme se `exames-v1.xlsx` está na mesma pasta de `index.html`.
-  - verifique se o servidor HTTP foi iniciado (evite abrir por `file://`).
-- Exame não encontrado:
-  - confirme código/nome na planilha.
-  - tente buscar sem pontuação extra.
-- Caracteres acentuados aparecendo incorretamente:
-  - salve os arquivos de texto em UTF-8.
-
-## Melhorias sugeridas
-
-- Persistência do carrinho em `localStorage`.
-- Máscara para CPF e telefone.
-- Validação mais rígida de dados do paciente.
-- Geração de PDF real no front-end (ex.: `jsPDF`) sem depender da impressão.
-- Testes unitários para cálculo de descontos e parser do Excel.
+  - Confirme `exames-v1.xlsx` na mesma pasta de `index.html`.
+  - Execute por `http://localhost` (nao usar `file://`).
+- Exame nao encontrado:
+  - Revise codigo/nome na planilha.
+  - Tente busca parcial.
+- Texto com acentuacao quebrada:
+  - Garanta arquivos em UTF-8.
 
 ## Autor
 

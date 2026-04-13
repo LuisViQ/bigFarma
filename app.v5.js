@@ -10,7 +10,6 @@ const HISTORY_MAX_BYTES = 700 * 1024; // ~700 KB
 const HISTORY_FALLBACK_LIMIT = 30;
 const HISTORY_MAX_ITEMS_PER_ORDER = 120;
 
-// Os IDs originais em string foram mantidos para não quebrar o HTML
 const inputName = document.getElementById("produtoNome");
 const inputPrice = document.getElementById("produtoPreco");
 const inputQty = document.getElementById("produtoQtd");
@@ -21,7 +20,7 @@ const tdTotalFinal = document.getElementById("totalFinal");
 const btnExportPdf = document.getElementById("btnExportarPdf");
 const btnExportNativePdf = document.getElementById("btnExportarPdfNativo");
 const btnExportHistory = document.getElementById("btnExportarHistorico");
-const btnClearCart = document.getElementById("btnLimparCarrinho");
+const btnClearCart = document.getElementById("btnLimpar");
 const inputItemDiscountPct = document.getElementById("descontoItemPct");
 const inputTotalDiscountPct = document.getElementById("descontoTotalPct");
 const elExamsStatus = document.getElementById("statusExames");

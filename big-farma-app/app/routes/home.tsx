@@ -9,7 +9,12 @@ import { AdminPanel } from "~/components/admin-panel";
 import { formatCpf, formatPhone } from "~/utils/masks";
 import { OrderPDF } from "~/components/order-pdf";
 import { pdf } from "@react-pdf/renderer";
-
+export function meta() {
+  return [
+    { title: "BigFarma | Painel de Atendimento" },
+    { name: "description", content: "Sistema integrado de pedidos e exames." },
+  ];
+}
 export default function Home() {
   const navigate = useNavigate();
   const [isAdmin, setIsAdmin] = useState(false);

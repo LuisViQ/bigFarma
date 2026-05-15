@@ -8,7 +8,9 @@ import { useNavigate } from "react-router";
 import { Button } from "~/components/button";
 import { Input } from "~/components/input";
 import { auth, db } from "~/services/firebase/firebase";
-
+export function meta() {
+  return [{ title: "BigFarma | Login" }];
+}
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
